@@ -1,0 +1,33 @@
+1,  全量备份
+mysqldump -uroot -p123456 --lock-all-tables --flush-logs test > /home/backup.sql
+
+参数：   --flush-logs:   使用一个新的日志文件来记录接下来的日志
+		 --lock-all-tables:  锁定所有数据库；
+		 
+
+		 
+2, 恢复全量备份
+ mysql -h localhost -uroot -p123456 < backup.sql
+ 或者：  mysql> source /path/backup/backup.sql
+ 
+ 
+3, 增量备份
+首先在进行增量备份之前需要查看一下配置文件， 查看logbin是否开启，因为要做增量备份首先要开启logbin。
+进入mysql命令行， 输入如下命令：
+
+show variables like '%log_bin%';
+
+
+修改/etc/my.cnf文件：
+#binlog setting, 开启增量备份的关键
+log-bin=/var/lib/mysql/mysql-bin
+server-id=1
+
+
+重启mysql
+show variables like '%log_bin%';
+
+查看状态：
+show master status;
+
+
