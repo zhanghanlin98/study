@@ -1,0 +1,97 @@
+<Huawei> display version   =====显示设备版本号， 型号， 启动时间
+
+
+配置设备console密码， 主机名， 时间， 时区， baner
+<Huawei>system-view   =====进入系统视图（相当于思科的全局配置模式）
+[Huawei] quit or return   ===退出系统视图
+[Huawei] sysname R1   ===配置主机名
+
+[R1] user-interface console 0   =====进入console口， 默认无密码
+[R1-ui-console0] authentication-mode password
+Please configure the login password(maximum length 16):5   =====选择密码长度
+[R1-ui-console0] set authentication password cipher  huawei   ===配置一个密文形式密码（可以选择明文，命令为simple）
+[R1-ui-console0] idle-timeout 3 20   ====配置空闲超时时间3分20秒， 默认10分钟
+
+<R1>display clock   ===显示系统时间
+<R1>clock timezone GMT add 08:00:00    ====配置系统时区， 中国为+8区
+<R1>clock datetime 22:59:00 2020-05-11   ====配置系统时间
+
+[R1]super password cipher huawei  ====配置密文super密码， 防止非法用户权限提升
+[R1]display current-configureation | include super    ====显示super密码配置
+
+
+
+
+配置接口地址与Telnet，  ssh
+[R1] display ip interface brief    ==== 查看接口状态
+[R1]  display interface g0/0/0   ====查看接口详细信息
+[R1] interface g0/0/0   ====进入接口模式
+[R1-GigabitEthernet0/0/0] ip address 202.100.1.1 255.255.255.0
+<R1>display ip int brief   
+
+[R1]user-interface vty 0 4    =====进入线下模式
+[R1-ui-vty0-4] set authentication password cipher huawei     =====配置加密密码为huawei
+<R1>display telnet server status    ======查看Telnet server状态
+
+
+
+查看，保存， 清空，重启路由器
+[R1] display current-configureation   ===查看路由器当前配置信息
+<R1>save   ======保存路由器当前配置信息
+<R1> stratup saved-configuretion iascfg.zip   =====配置下次启动加载配置文件
+<R1> display startup     ====查看下次启动加载配置文件
+<R1> reset saved-configureation     =====清空配置
+<R1> reboot   ====重启路由器
+
+
+
+配置ip地址：
+R1
+[R1]interface g0/0/1
+[R1-GigabitEthernet0/0/1] ip address 202.100.1.1 255.255.255.0
+quit
+[R1]interface g0/0/2
+[R1-GigabitEthernet0/0/2] ip address 202.100.2.1 255.255.255.0
+[R1-GigabitEthernet0/0/1]int lo 0    ====创建环回接口
+[R1-LoopBack0] ip add 1.1.1.1  255.255.255.255
+[R1-LoopBack0] quit
+
+[R1]display current-configuration interface    ====显示接口信息
+
+
+R2：
+[R2]interface g0/0/1
+[R2-GigabitEthernet0/0/1] ip add 202.100.1.2 255.255.255.0
+[R2-GigabitEthernet0/0/1] int g0/0/0
+[R2-GigabitEthernet0/0/0] ip add 202.100.3.2  255.255.255.0
+[R2-GigabitEthernet0/0/0]int lo 0
+[R1-LoopBack0] ip add 2.2.2.2 255.255.255.255
+[R1-LoopBack0]quit
+
+[R3]int g0/0/2
+[R3-GigabitEthernet0/0/2]ip add 202.100.2.3 255.255.255.0
+[R3-GigabitEthernet0/0/2] int g0/0/0
+[R3-GigabitEthernet0/0/0] ip add 202.100.3.3  255.255.255.0
+[R3-GigabitEthernet0/0/0]int lo 0
+[R3-LoopBack0] ip add 3.3.3.3 255.255.255.255
+
+
+<R1>display ip routing-table    ====查看路由表
+
+
+配置惊天路由  
+[R1] ip route-static 3.3.3.3  255.255.255.255 202.100.2.3    ====添加静态路由
+[R1] ip route-static 202.100.3.0   255.255.255.0  202.100.2.3  
+[R1]display ip routing-table     
+
+配置浮动路由用于备份
+[R2] ip route-static 3.3.3.3  255.255.255.255  202.100.3.3
+[R1] ip route-static 202.100.3.0 24 202.100.1.1  preference 80
+[R1] ip route-static 3.3.3.3  32 202.100.1.2 perference 80
+[R3]ip route-static 202.100.1.0 255.255.255.0 202.100.3.2
+
+
+
+
+
+ 
