@@ -1,0 +1,62 @@
+#!groovy
+pipeline {
+	agent  any
+	
+	environment {
+		REPOSITYORY="ssh://git@10.1.2.167:2222/zhanghaolin/microservice.git"
+		MODULE="user-edge-service"
+		SCRIPT_PATH="/home/scripts"
+	
+	}
+	
+	stages {
+		stage('获取代码') {
+			steps {
+				echo "start fetch code from 
+				git:${REPOSTIORY}"
+				deleteDir()
+				git "${REPOSTIORY}"
+				
+		
+		stage('编译+单元测试') {
+			steps {
+				echo "start complie"
+				sh "mvn -U -pl ${MODULE} -am clean package"
+				
+		stage('构建镜像'){
+			steps {
+				echo "start build image"
+				sh "{SCRIPT_PATH}/build-images.sh ${MODULE}"
+					}
+				}
+		stage('发布系统') {
+				steps {
+					echo "strat deploy"
+					sh "${SCRIPT_PATH}/deploy.sh"
+						}
+					}
+				
+			}
+		}
+	}
+}
+
+
+vim build-images.sh
+#!/bin/bash
+MODULE=$1
+TIME=`date "+%Y-%m-%d %H:%M"`
+GIT_REVERSION=`git log -1 --pretty=format:"%h"`
+IMAGES_NAME=10.1.2.167:8080/micro-service/${MODULE}:${TIME}
+
+
+cd ${MODULE}
+docker build  -t ${IMAGE_NAME} .
+
+cd -
+
+docker push ${IMAGE_NAME}
+
+vim deploy.sh
+
+
