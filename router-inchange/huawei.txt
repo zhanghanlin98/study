@@ -79,7 +79,7 @@ R2：
 <R1>display ip routing-table    ====查看路由表
 
 
-配置惊天路由  
+配置静态路由  
 [R1] ip route-static 3.3.3.3  255.255.255.255 202.100.2.3    ====添加静态路由
 [R1] ip route-static 202.100.3.0   255.255.255.0  202.100.2.3  
 [R1]display ip routing-table     
